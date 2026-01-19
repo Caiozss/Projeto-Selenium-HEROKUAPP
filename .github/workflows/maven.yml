@@ -1,0 +1,37 @@
+name: Execução de Testes Selenium CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Rodar Testes no Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
+
+    - name: Configurar JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    # AQUI ESTÁ O TRUQUE: Avisamos para entrar na pasta 'Selenium'
+    - name: Executar Testes com Maven
+      run: mvn -f Selenium/pom.xml test
+
+    - name: Salvar Evidências
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: relatorio-de-testes
+        path: |
+          Selenium/relatorios/
+          Selenium/prints/
+          Selenium/target/surefire-reports/
